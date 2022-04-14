@@ -15,6 +15,7 @@ load() {
     source "$DIR/auth.sh"
     source "$DIR/auth-legacy.sh"
     source "$DIR/env.sh"
+    source "$DIR/vpn.sh"
 }
 
 load
