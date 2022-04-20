@@ -1,6 +1,6 @@
 #!/bin/bash
 
-function load-env() {
+load-env() {
     local env_name="$1"
 
     if [ -z "${env_name}" ]; then
@@ -25,9 +25,9 @@ function load-env() {
 
     # load secrets from keepassxc vault
     local database_path
-    database_path="$(echo "$config_json" | jq -r ".secrets.from_vault.database_path")"
+    database_path="$(json_field "$config_json" "secrets.from_vault.database_path")"
     local group_path
-    group_path="$(echo "$config_json" | jq -r ".secrets.from_vault.group_path")"
+    group_path="$(json_field "$config_json" "secrets.from_vault.group_path")"
 
     local database_password
     echo -n "🔐 Enter password for keepassxc database '$database_path': "
@@ -35,9 +35,7 @@ function load-env() {
     echo
 
     # load plain env vars
-    local vars_count
-    vars_count=$(echo "$config_json" | jq -r ".vars | length")
-    if (( vars_count > 0 )); then
+    if ! json_empty "$config_json" vars; then
         for var_name in $(echo "$config_json" | jq -r ".vars | keys | .[]"); do
             local var_value
             var_value="$(echo "$config_json" | jq -r ".vars.${var_name}")"

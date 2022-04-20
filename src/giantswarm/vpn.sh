@@ -1,32 +1,31 @@
 #!/bin/bash
 
 start-vpn() {
-    local connection=$1
-
-    local config_path="$NIKOLA_CONFIG_PATH"
-    if [ -z "${config_path}" ]; then
-        config_path="$HOME/config"
-    fi
+    local server_id=$1
 
     # Get VPN config
-    local gs_vpn_config_path="${config_path}/dev/network/vpn/giantswarm.cue"
     local vpn_config_json
-    vpn_config_json="$(cue export "$gs_vpn_config_path")"
+    vpn_config_json="$(config_build_json dev/network/vpn/giantswarm.cue)"
 
-    if [ -z "$connection" ]; then
-        connection="$(echo "$vpn_config_json" | jq -r ".default_server")"
+    if [ -z "$server_id" ]; then
+        server_id="$(json_field "$vpn_config_json" default_server)"
     fi
+
+    local openvpn_config
+    openvpn_config="$(json_array_select_by_id "$vpn_config_json" servers "$server_id")"
 
     local openvpn_config_path
-    openvpn_config_path="$(echo "$vpn_config_json" | jq -r ".servers[] | select (.name==\"${connection}\") | .openvpn_config_path")"
+    openvpn_config_path="$(json_field "$openvpn_config" openvpn_config_path)"
     if [ -z "${openvpn_config_path}" ]; then
-        log_error "Config for VPN server '$connection' not found"
+        log_error "Config for VPN server '$server_id' not found"
+        return
     fi
 
-    log_begin "Starting $connection VPN"
+    sudo true
+    log_begin "Starting $server_id VPN"
     opsctl vpn open --vpn-config-file="$openvpn_config_path" > /dev/null
-    export __OPSCTL_VPN_CONNECTION="$connection"
-    log_end "Started $connection VPN"
+    export __OPSCTL_VPN_CONNECTION="$server_id"
+    log_end "Started $server_id VPN"
 }
 
 stop-vpn() {
@@ -36,25 +35,23 @@ stop-vpn() {
         return
     fi
 
-    local connection="$__OPSCTL_VPN_CONNECTION"
+    local server_id="$__OPSCTL_VPN_CONNECTION"
 
-    local config_path="$NIKOLA_CONFIG_PATH"
-    if [ -z "${config_path}" ]; then
-        config_path="$HOME/config"
-    fi
-
-    # Get VPN config
-    local gs_vpn_config_path="${config_path}/dev/network/vpn/giantswarm.cue"
     local vpn_config_json
-    vpn_config_json="$(cue export "$gs_vpn_config_path")"
+    vpn_config_json="$(config_build_json dev/network/vpn/giantswarm.cue)"
+
+    local openvpn_config
+    openvpn_config="$(json_array_select_by_id "$vpn_config_json" servers "$server_id")"
 
     local openvpn_config_path
-    openvpn_config_path="$(echo "$vpn_config_json" | jq -r ".servers[] | select (.name==\"${connection}\") | .openvpn_config_path")"
+    openvpn_config_path="$(json_field "$openvpn_config" openvpn_config_path)"
     if [ -z "${openvpn_config_path}" ]; then
-        log_error "Config for VPN server '$connection' not found"
+        log_error "Config for VPN server '$server_id' not found"
+        return
     fi
 
-    log_begin "Closing '${connection}' VPN connection"
+    sudo true
+    log_begin "Closing '${server_id}' VPN connection"
     opsctl vpn close --vpn-config-file="$openvpn_config_path" > /dev/null
-    log_end "Closed '${connection}' VPN connection"
+    log_end "Closed '${server_id}' VPN connection"
 }
