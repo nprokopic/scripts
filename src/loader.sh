@@ -19,6 +19,9 @@ load() {
     DIR="$( cd -P "$( dirname "$SOURCE" )" >/dev/null 2>&1 && pwd )"
 
     source "$DIR/io/loader.sh"
+    source "$DIR/text/loader.sh"
+    source "$DIR/config/loader.sh"
+    source "$DIR/security/loader.sh"
     source "$DIR/env/loader.sh"
     source "$DIR/git/loader.sh"
     source "$DIR/kubectl/loader.sh"
