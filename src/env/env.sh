@@ -40,12 +40,11 @@ load-env() {
             local var_value
             var_value="$(echo "$config_json" | jq -r ".vars.${var_name}")"
             export "$var_name"="$var_value"
-            log_success "Set $var_name"
+            log_info "Set $var_name"
         done
     fi
 
     for secret_entry in $(echo "$database_password" | keepassxc-cli ls "$database_path" "$group_path" --quiet); do
-        log_begin "Loading $secret_entry"
         local var_value
         var_value="$(keepassxc_show_password \
             "$database_path" \
@@ -53,6 +52,6 @@ load-env() {
             "$group_path/$secret_entry" \
             "Password")"
         export "$secret_entry"="$var_value"
-        log_end "Set $secret_entry secret"
+        log_info "Set $secret_entry secret."
     done
 }

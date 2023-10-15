@@ -12,8 +12,7 @@ load() {
     done
     DIR="$( cd -P "$( dirname "$SOURCE" )" >/dev/null 2>&1 && pwd )"
 
-    source "$DIR/commit.sh"
-    source "$DIR/reset.sh"
+    source "$DIR/sync.sh"
 }
 
 load

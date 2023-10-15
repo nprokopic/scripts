@@ -32,18 +32,18 @@ __login-mc-legacy() {
         log_info "Already logged in to $mc"
         if [[ $(kubectl config current-context) != "$desired_context" ]]; then
             kubectl config use-context "$desired_context" >/dev/null
-            log_success "Switched to context $desired_context"
+            log_info "Switched to context $desired_context"
         fi
     else
         if opsctl create kubeconfig -i "$mc" --ttl 1; then
-            log_success "Logged in to $mc"
+            log_info "Logged in to $mc"
         else
             log_error "Failed to login to MC $mc"
         fi
     fi
 
     gsctl select endpoint "$mc" >/dev/null
-    log_success "Selected gsctl endpoint $mc"
+    log_info "Selected gsctl endpoint $mc"
 }
 
 __login-wc-legacy() {

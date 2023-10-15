@@ -31,22 +31,24 @@ load-ssh-key() {
 
     ssh_key_file_path="${HOME}/.ssh/${ssh_key_file}"
 
-    if [ -z "$SSH_AGENT_PID" ] || [ "$(ps -p $SSH_AGENT_PID | grep [s]sh-agent | grep -v "<defunct>" | wc -l)" -eq 0 ]; then
-        eval "$(ssh-agent -s)" > /dev/null
-        log_success "ssh-agent started."
+    if [[ $SSH_AUTH_SOCK == "/run/user/1000/keyring/ssh" ]]; then
+        log_info "Using Gnome keyring."
+    else
+        log_error "SSH_AUTH_SOCK not pointing to Gnome keyring, but to '$SSH_AUTH_SOCK'. Load key manually (with ssh-add command)"
+        return
     fi
 
     if [ -z "$(ssh-add -l | grep "$ssh_key_comment")" ] ; then
         (( ssh_key_ttl=24*60*60 ))
 
         if [ "$key_id" == "yka" ] || [ "$key_id" == "ykc" ]; then
-            log_begin "Adding SSH security key"
+            log_info "Adding SSH security key"
             ssh-add -K -t "$ssh_key_ttl" "$ssh_key_file_path"
-            log_end "Added SSH security key"
+            log_info "Added SSH security key"
         else
-            log_begin "Adding SSH key"
+            log_info "Adding SSH key"
             ssh-add -t "$ssh_key_ttl" "$ssh_key_file_path"
-            log_end "Added SSH key"
+            log_info "Added SSH key"
         fi
     else
         log_info "SSH key '$key_id' is already loaded."
@@ -58,6 +60,11 @@ function stop-ssh-agent {
         log_info "ssh-agent was already stopped."
     else
         eval "$(ssh-agent -k)" > /dev/null 2>&1
-        log_success "ssh-agent stopped."
+        log_info "ssh-agent stopped."
     fi
+}
+
+function clear-ssh-agent {
+    ssh-add -D > /dev/null 2>&1
+    log_info "All manually added keys removed from ssh-agent"
 }

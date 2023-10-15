@@ -1,4 +1,6 @@
-#!/bin/bash
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" # This loads nvm
+[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
 
 load() {
     local SOURCE
@@ -29,7 +31,12 @@ load() {
     source "$DIR/secrets/loader.sh"
     source "$DIR/backup/loader.sh"
     source "$DIR/azure/loader.sh"
+    source "$DIR/notes/loader.sh"
 }
 
 load
 unset -f load
+
+# TODO: move to tools/node
+
+source /usr/share/nvm/init-nvm.sh

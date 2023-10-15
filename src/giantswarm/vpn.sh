@@ -22,10 +22,10 @@ start-vpn() {
     fi
 
     sudo true
-    log_begin "Starting $server_id VPN"
+    log_info "Starting $server_id VPN"
     opsctl vpn open --vpn-config-file="$openvpn_config_path" > /dev/null
     export __OPSCTL_VPN_CONNECTION="$server_id"
-    log_end "Started $server_id VPN"
+    log_info "Started $server_id VPN"
 }
 
 stop-vpn() {
@@ -51,7 +51,7 @@ stop-vpn() {
     fi
 
     sudo true
-    log_begin "Closing '${server_id}' VPN connection"
+    log_info "Closing '${server_id}' VPN connection"
     opsctl vpn close --vpn-config-file="$openvpn_config_path" > /dev/null
-    log_end "Closed '${server_id}' VPN connection"
+    log_info "Closed '${server_id}' VPN connection"
 }

@@ -32,13 +32,13 @@ __login-mc() {
         log_info "Already logged in to $mc"
         if [[ $(kubectl config current-context) != "$desired_context" ]]; then
             kubectl config use-context "$desired_context" >/dev/null
-            log_success "Switched to context $desired_context"
+            log_info "Switched to context $desired_context"
         else
             log_info "Context $desired_context already selected"
         fi
     else
         if opsctl login "$mc"; then
-            log_success "Logged in to $mc"
+            log_info "Logged in to $mc"
         else
             log_error "Failed to login to MC $mc"
         fi
@@ -56,13 +56,13 @@ __login-wc() {
         log_info "Already logged in to WC $mc/$wc"
         if [[ $(kubectl config current-context) != "$desired_context" ]]; then
             kubectl config use-context "$desired_context" >/dev/null
-            log_success "Switched to context $desired_context"
+            log_info "Switched to context $desired_context"
         else
             log_info "Context $desired_context already selected"
         fi
     else
         if opsctl login "$mc" "$wc"; then
-            log_success "Logged in to WC $mc/$wc"
+            log_info "Logged in to WC $mc/$wc"
         else
             log_error "Failed to login to WC $mc/$wc"
         fi

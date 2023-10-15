@@ -13,8 +13,11 @@ load() {
     DIR="$( cd -P "$( dirname "$SOURCE" )" >/dev/null 2>&1 && pwd )"
 
     source "$DIR/auth.sh"
+    source "$DIR/logs.sh"
     source "$DIR/search.sh"
 }
 
 load
 unset -f load
+
+alias k=kubectl
